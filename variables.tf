@@ -9,7 +9,7 @@ variable "vpn_port_number" {
 }
 
 variable "admin_name" {
-  default     = "admin"
+  default     = "cyrus"
   description = "User name to login to the VM"
 }
 

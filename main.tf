@@ -149,4 +149,20 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
   }
+  
+  connection {
+    type     = "ssh"
+    user     = var.admin_name
+    password = var.admin_password
+    host     = self.public_ip_address
+  }  
+  
+  provisioner "remote-exec" {
+    inline = [
+      "echo ${var.admin_password} | sudo su",
+      "sudo apt-get update -y && apt-get upgrade -y",
+      "sudo apt-get install docker.io -y",
+      "sudo docker run -itd --cap-add=NET_ADMIN -p ${var.vpn_port_number}:1194/udp -p 80:8080/tcp -e HOST_ADDR=$(curl -s https://api.ipify.org) --name dockovpn alekslitvinenk/openvpn"
+    ]
+  }
 }
