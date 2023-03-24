@@ -1,3 +1,4 @@
+cd terraform-azure-free-vm
 terraform init
 terraform plan -out main.tfplan
 terraform apply main.tfplan
