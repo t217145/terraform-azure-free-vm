@@ -23,9 +23,6 @@ resource "azurerm_subnet" "my_terraform_subnet" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.my_terraform_network.name
   address_prefixes     = ["10.0.1.0/24"]
-  tags = {
-    "your name" = var.admin_name
-  }   
 }
 
 # Create public IPs
@@ -104,9 +101,6 @@ resource "azurerm_network_interface" "my_terraform_nic" {
 resource "azurerm_network_interface_security_group_association" "example" {
   network_interface_id      = azurerm_network_interface.my_terraform_nic.id
   network_security_group_id = azurerm_network_security_group.my_terraform_nsg.id
-  tags = {
-    "your name" = var.admin_name
-  }   
 }
 
 # Generate random text for a unique storage account name
@@ -115,9 +109,6 @@ resource "random_id" "random_id" {
     # Generate a new ID only when a new resource group is defined
     resource_group = azurerm_resource_group.rg.name
   }
-  tags = {
-    "your name" = var.admin_name
-  }   
 
   byte_length = 8
 }
