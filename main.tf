@@ -1,37 +1,52 @@
 resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
-  name     = "vpnVMRG"
+  name     = "vpnVMRG-${var.admin_name}"
+  tags = {
+    "your name" = var.admin_name
+  }  
 }
 
 # Create virtual network
 resource "azurerm_virtual_network" "my_terraform_network" {
-  name                = "vpnVMVnet"
+  name                = "${var.admin_name}-vpnVMVnet"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  tags = {
+    "your name" = var.admin_name
+  }   
 }
 
 # Create subnet
 resource "azurerm_subnet" "my_terraform_subnet" {
-  name                 = "vpnVMSubnet"
+  name                 = "${var.admin_name}-vpnVMSubnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.my_terraform_network.name
   address_prefixes     = ["10.0.1.0/24"]
+  tags = {
+    "your name" = var.admin_name
+  }   
 }
 
 # Create public IPs
 resource "azurerm_public_ip" "my_terraform_public_ip" {
-  name                = "vpnVMPublicIP"
+  name                = "${var.admin_name}-vpnVMPublicIP"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
+  tags = {
+    "your name" = var.admin_name
+  }   
 }
 
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "my_terraform_nsg" {
-  name                = "vpnVMNSG"
+  name                = "${var.admin_name}-vpnVMNSG"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  tags = {
+    "your name" = var.admin_name
+  }   
 
   security_rule {
     name                       = "SSH"
@@ -70,12 +85,15 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
 
 # Create network interface
 resource "azurerm_network_interface" "my_terraform_nic" {
-  name                = "vpnVMNIC"
+  name                = "${var.admin_name}-vpnVMNIC"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  tags = {
+    "your name" = var.admin_name
+  }   
 
   ip_configuration {
-    name                          = "vpnVM_nic_configuration"
+    name                          = "${var.admin_name}-vpnVM_nic_configuration"
     subnet_id                     = azurerm_subnet.my_terraform_subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip.id
@@ -86,6 +104,9 @@ resource "azurerm_network_interface" "my_terraform_nic" {
 resource "azurerm_network_interface_security_group_association" "example" {
   network_interface_id      = azurerm_network_interface.my_terraform_nic.id
   network_security_group_id = azurerm_network_security_group.my_terraform_nsg.id
+  tags = {
+    "your name" = var.admin_name
+  }   
 }
 
 # Generate random text for a unique storage account name
@@ -94,17 +115,23 @@ resource "random_id" "random_id" {
     # Generate a new ID only when a new resource group is defined
     resource_group = azurerm_resource_group.rg.name
   }
+  tags = {
+    "your name" = var.admin_name
+  }   
 
   byte_length = 8
 }
 
 # Create storage account for boot diagnostics
 resource "azurerm_storage_account" "my_storage_account" {
-  name                     = "diag${random_id.random_id.hex}"
+  name                     = "${var.admin_name}-diag${random_id.random_id.hex}"
   location                 = azurerm_resource_group.rg.location
   resource_group_name      = azurerm_resource_group.rg.name
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  tags = {
+    "your name" = var.admin_name
+  }   
 }
 
 # Create (and display) an SSH key
@@ -115,14 +142,17 @@ resource "azurerm_storage_account" "my_storage_account" {
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
-  name                  = "vpnVM"
+  name                  = "${var.admin_name}-vpnVM"
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
   size                  = "Standard_B1s"
+  tags = {
+    "your name" = var.admin_name
+  }   
 
   os_disk {
-    name                 = "vpnVMOsDisk"
+    name                 = "${var.admin_name}-vpnVMOsDisk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -134,7 +164,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     version   = "latest"
   }
 
-  computer_name                   = "vpnVM"
+  computer_name                   = "${var.admin_name}-vpnVM"
   admin_username                  = var.admin_name
 
   disable_password_authentication = false
