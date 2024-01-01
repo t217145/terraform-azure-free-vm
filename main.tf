@@ -110,7 +110,7 @@ resource "random_id" "stg-acct-id" {
 
 # Create storage account for boot diagnostics
 resource "azurerm_storage_account" "my_storage_account" {
-  name                     = "${var.admin_name}diag-${format("%.4s", random_id.stg-acct-id.dec)}"
+  name                     = "${var.admin_name}diag${format("%.4s", random_id.stg-acct-id.dec)}"
   location                 = azurerm_resource_group.rg.location
   resource_group_name      = azurerm_resource_group.rg.name
   account_tier             = "Standard"
